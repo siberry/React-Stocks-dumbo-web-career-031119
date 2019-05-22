@@ -14,7 +14,7 @@ const Stock = (props) => (
         {props.type === "stock" ?
           <button onClick={() => props.addToPortfolio(props)}>Add To Portfolio</button>
           :
-          <button onClick={() => props.removeFromPortfolio(props.id)}>Remove From Portfolio</button>
+          <button onClick={() => props.removeFromPortfolio(props.id)}>Sell Stock</button>
         }
       </div>
     </div>

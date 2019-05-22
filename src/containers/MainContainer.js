@@ -6,7 +6,9 @@ import SearchBar from '../components/SearchBar'
 class MainContainer extends Component {
   state = {
     stocks: [],
-    portfolio: []
+    portfolio: [],
+    sort: null,
+    filter: undefined
   }
   componentDidMount() {
     fetch("http://localhost:3000/stocks")
@@ -14,6 +16,31 @@ class MainContainer extends Component {
     .then(stocks => this.setState({
       stocks
     }))
+  }
+
+  render() {
+    const organizedStocks =  this.applySort(this.applyFilter())
+    return (
+      <div>
+        <SearchBar setSortState={this.setSortState} setFilterState={this.setFilterState} sort={this.state.sort} filter={this.state.filter}/>
+
+        <div className="row">
+          <div className="col-8">
+
+            <StockContainer
+              stocks={organizedStocks}
+              addToPortfolio={this.addToPortfolio}
+              />
+
+          </div>
+          <div className="col-4">
+
+            <PortfolioContainer portfolio={this.state.portfolio} removeFromPortfolio={this.removeFromPortfolio}/>
+
+          </div>
+        </div>
+      </div>
+    );
   }
 
   addToPortfolio = (stock) => {
@@ -29,28 +56,31 @@ class MainContainer extends Component {
     })
   }
 
-  render() {
-    return (
-      <div>
-        <SearchBar/>
+  setSortState = (sort) => {
+    this.setState({
+      sort
+    })
+  }
 
-          <div className="row">
-            <div className="col-8">
+  applySort = (arr) => {
+    let {sort} = this.state
+    let sortedStocks = arr.sort((a, b) => (a[sort] > b[sort]) ? 1 : -1)
+    return sortedStocks
+  }
 
-              <StockContainer
-                stocks={this.state.stocks}
-                addToPortfolio={this.addToPortfolio}
-                />
+  setFilterState = (filter) => {
+    this.setState({
+      filter
+    })
+  }
 
-            </div>
-            <div className="col-4">
-
-              <PortfolioContainer portfolio={this.state.portfolio} removeFromPortfolio={this.removeFromPortfolio}/>
-
-            </div>
-          </div>
-      </div>
-    );
+  applyFilter = () => {
+    if (this.state.filter) {
+      let filteredStocks = this.state.stocks.filter(stock => stock.type === this.state.filter)
+      return filteredStocks
+    }else {
+      return this.state.stocks
+    }
   }
 
 }
